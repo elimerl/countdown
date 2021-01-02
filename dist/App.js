@@ -13,6 +13,7 @@ import {
 	noop,
 	run_all,
 	safe_not_equal,
+	set_custom_element_data,
 	set_data,
 	set_input_value,
 	set_style,
@@ -23,48 +24,76 @@ import {
 import confetti from "../web_modules/canvas-confetti.js";
 
 function create_fragment(ctx) {
+	let script;
+	let script_src_value;
+	let t0;
 	let div1;
 	let header;
 	let div0;
 	let p;
-	let span;
-	let span_spellcheck_value;
-	let t0;
+	let span0;
+	let ion_icon0;
 	let t1;
+	let span1;
+	let ion_icon1;
+	let span1_hidden_value;
 	let t2;
-	let input;
+	let br;
 	let t3;
-	let button;
+	let span2;
+	let span2_spellcheck_value;
+	let t4;
 	let t5;
+	let t6;
+	let input;
+	let t7;
+	let button;
+	let t9;
 	let small;
 	let mounted;
 	let dispose;
 
 	return {
 		c() {
+			script = element("script");
+			t0 = space();
 			div1 = element("div");
 			header = element("header");
 			div0 = element("div");
 			p = element("p");
-			span = element("span");
-			t0 = space();
-			t1 = text(/*msg*/ ctx[3]);
+			span0 = element("span");
+			ion_icon0 = element("ion-icon");
+			t1 = space();
+			span1 = element("span");
+			ion_icon1 = element("ion-icon");
 			t2 = space();
-			input = element("input");
+			br = element("br");
 			t3 = space();
+			span2 = element("span");
+			t4 = space();
+			t5 = text(/*msg*/ ctx[3]);
+			t6 = space();
+			input = element("input");
+			t7 = space();
 			button = element("button");
 			button.textContent = "Copy\n\t\t\t\tPermalink";
-			t5 = space();
+			t9 = space();
 			small = element("small");
 
 			small.textContent = `Uses
 			${Intl.DateTimeFormat().resolvedOptions().timeZone}
 			time.`;
 
-			span.hidden = /*usrMsgElement*/ ctx[2];
-			attr(span, "contenteditable", "");
-			attr(span, "spellcheck", span_spellcheck_value = false);
-			if (/*userMessage*/ ctx[1] === void 0) add_render_callback(() => /*span_input_handler*/ ctx[5].call(span));
+			attr(script, "lang", "js");
+			if (script.src !== (script_src_value = "https://unpkg.com/ionicons@5.1.2/dist/ionicons/ionicons.js")) attr(script, "src", script_src_value);
+			set_custom_element_data(ion_icon0, "name", "hourglass-outline");
+			span0.hidden = /*usrMsgElement*/ ctx[2];
+			set_custom_element_data(ion_icon1, "name", "checkmark-outline");
+			span1.hidden = span1_hidden_value = !/*usrMsgElement*/ ctx[2];
+			span2.hidden = /*usrMsgElement*/ ctx[2];
+			attr(span2, "contenteditable", "");
+			attr(span2, "spellcheck", span2_spellcheck_value = false);
+			if (/*userMessage*/ ctx[1] === void 0) add_render_callback(() => /*span2_input_handler*/ ctx[5].call(span2));
 			set_style(p, "font-size", "3em");
 			attr(p, "class", "svelte-22ess9");
 			attr(input, "type", "datetime-local");
@@ -76,29 +105,39 @@ function create_fragment(ctx) {
 			attr(div1, "class", "App svelte-22ess9");
 		},
 		m(target, anchor) {
+			append(document.head, script);
+			insert(target, t0, anchor);
 			insert(target, div1, anchor);
 			append(div1, header);
 			append(header, div0);
 			append(div0, p);
-			append(p, span);
+			append(p, span0);
+			append(span0, ion_icon0);
+			append(p, t1);
+			append(p, span1);
+			append(span1, ion_icon1);
+			append(p, t2);
+			append(p, br);
+			append(p, t3);
+			append(p, span2);
 
 			if (/*userMessage*/ ctx[1] !== void 0) {
-				span.innerHTML = /*userMessage*/ ctx[1];
+				span2.innerHTML = /*userMessage*/ ctx[1];
 			}
 
-			append(p, t0);
-			append(p, t1);
-			append(div0, t2);
+			append(p, t4);
+			append(p, t5);
+			append(div0, t6);
 			append(div0, input);
 			set_input_value(input, /*countdown*/ ctx[0]);
-			append(div0, t3);
+			append(div0, t7);
 			append(div0, button);
-			append(header, t5);
+			append(header, t9);
 			append(header, small);
 
 			if (!mounted) {
 				dispose = [
-					listen(span, "input", /*span_input_handler*/ ctx[5]),
+					listen(span2, "input", /*span2_input_handler*/ ctx[5]),
 					listen(input, "input", /*input_input_handler*/ ctx[6]),
 					listen(button, "click", /*click_handler*/ ctx[7])
 				];
@@ -108,14 +147,22 @@ function create_fragment(ctx) {
 		},
 		p(ctx, [dirty]) {
 			if (dirty & /*usrMsgElement*/ 4) {
-				span.hidden = /*usrMsgElement*/ ctx[2];
+				span0.hidden = /*usrMsgElement*/ ctx[2];
 			}
 
-			if (dirty & /*userMessage*/ 2 && /*userMessage*/ ctx[1] !== span.innerHTML) {
-				span.innerHTML = /*userMessage*/ ctx[1];
+			if (dirty & /*usrMsgElement*/ 4 && span1_hidden_value !== (span1_hidden_value = !/*usrMsgElement*/ ctx[2])) {
+				span1.hidden = span1_hidden_value;
 			}
 
-			if (dirty & /*msg*/ 8) set_data(t1, /*msg*/ ctx[3]);
+			if (dirty & /*usrMsgElement*/ 4) {
+				span2.hidden = /*usrMsgElement*/ ctx[2];
+			}
+
+			if (dirty & /*userMessage*/ 2 && /*userMessage*/ ctx[1] !== span2.innerHTML) {
+				span2.innerHTML = /*userMessage*/ ctx[1];
+			}
+
+			if (dirty & /*msg*/ 8) set_data(t5, /*msg*/ ctx[3]);
 
 			if (dirty & /*countdown*/ 1) {
 				set_input_value(input, /*countdown*/ ctx[0]);
@@ -124,6 +171,8 @@ function create_fragment(ctx) {
 		i: noop,
 		o: noop,
 		d(detaching) {
+			detach(script);
+			if (detaching) detach(t0);
 			if (detaching) detach(div1);
 			mounted = false;
 			run_all(dispose);
@@ -177,6 +226,7 @@ function instance($$self, $$props, $$invalidate) {
 	let usrMsgElement = false;
 	const parsedHash = {};
 	parser(window.location.hash.slice(1), parsedHash);
+	console.log(new Date().toISOString().slice(0, 16));
 
 	let countdown = parsedHash.countdown
 	? decodeURIComponent(parsedHash.countdown)
@@ -196,7 +246,7 @@ function instance($$self, $$props, $$invalidate) {
 		const time = timeLeft(countdownDate.getTime());
 
 		if (time.days <= 0 && time.hours <= 0 && time.minutes <= 0 && time.seconds <= 0) {
-			if (!finishedCountdown) fireworks(15000);
+			if (!finishedCountdown) fireworks(5000);
 			finishedCountdown = true;
 			$$invalidate(2, usrMsgElement = true);
 			$$invalidate(3, msg = "Finished!");
@@ -280,7 +330,7 @@ function instance($$self, $$props, $$invalidate) {
 		return url.href;
 	}
 
-	function span_input_handler() {
+	function span2_input_handler() {
 		userMessage = this.innerHTML;
 		$$invalidate(1, userMessage);
 	}
@@ -295,11 +345,16 @@ function instance($$self, $$props, $$invalidate) {
 	$$self.$$.update = () => {
 		if ($$self.$$.dirty & /*countdown, userMessage*/ 3) {
 			$: {
-				$$invalidate(2, usrMsgElement = false);
-				genMsg();
-				localStorage.setItem("lastDate", new Date(countdown).toISOString().slice(0, 16));
-				localStorage.setItem("userMessage", userMessage);
-				finishedCountdown = false;
+				const countdownDate = new Date(countdown);
+				const time = timeLeft(countdownDate.getTime());
+
+				if (time.days <= 0 && time.hours <= 0 && time.minutes <= 0 && time.seconds <= 0) {
+					$$invalidate(2, usrMsgElement = false);
+					genMsg();
+					localStorage.setItem("lastDate", new Date(countdown).toISOString().slice(0, 16));
+					localStorage.setItem("userMessage", userMessage);
+					finishedCountdown = false;
+				}
 			}
 		}
 	};
@@ -310,7 +365,7 @@ function instance($$self, $$props, $$invalidate) {
 		usrMsgElement,
 		msg,
 		getPermaLink,
-		span_input_handler,
+		span2_input_handler,
 		input_input_handler,
 		click_handler
 	];

@@ -46,6 +46,14 @@ function attr(node, attribute, value) {
     else if (node.getAttribute(attribute) !== value)
         node.setAttribute(attribute, value);
 }
+function set_custom_element_data(node, prop, value) {
+    if (prop in node) {
+        node[prop] = value;
+    }
+    else {
+        attr(node, prop, value);
+    }
+}
 function children(element) {
     return Array.from(element.childNodes);
 }
@@ -258,4 +266,4 @@ class SvelteComponent {
     }
 }
 
-export { SvelteComponent, add_render_callback, append, attr, detach, element, init, insert, listen, noop, run_all, safe_not_equal, set_data, set_input_value, set_style, space, text };
+export { SvelteComponent, add_render_callback, append, attr, detach, element, init, insert, listen, noop, run_all, safe_not_equal, set_custom_element_data, set_data, set_input_value, set_style, space, text };
