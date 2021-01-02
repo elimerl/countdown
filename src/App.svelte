@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import confetti from "canvas-confetti";
 	let usrMsgElement = false;
 	const parsedHash: {
@@ -7,6 +7,7 @@
 		time?: string;
 	} = {};
 	parser(window.location.hash.slice(1), parsedHash);
+	console.log(new Date().toISOString().slice(0, 16));
 	let countdown = parsedHash.countdown
 		? decodeURIComponent(parsedHash.countdown)
 		: localStorage.getItem("lastDate") ||
@@ -16,14 +17,24 @@
 		? decodeURIComponent(parsedHash.message)
 		: localStorage.getItem("userMessage") || "Countdown ends";
 	$: {
-		usrMsgElement = false;
-		genMsg();
-		localStorage.setItem(
-			"lastDate",
-			new Date(countdown).toISOString().slice(0, 16)
-		);
-		localStorage.setItem("userMessage", userMessage);
-		finishedCountdown = false;
+		const countdownDate = new Date(countdown);
+
+		const time = timeLeft(countdownDate.getTime());
+		if (
+			time.days <= 0 &&
+			time.hours <= 0 &&
+			time.minutes <= 0 &&
+			time.seconds <= 0
+		) {
+			usrMsgElement = false;
+			genMsg();
+			localStorage.setItem(
+				"lastDate",
+				new Date(countdown).toISOString().slice(0, 16)
+			);
+			localStorage.setItem("userMessage", userMessage);
+			finishedCountdown = false;
+		}
 	}
 	function timeLeft(countDownDate: number) {
 		const now = new Date().getTime();
@@ -48,8 +59,7 @@
 			time.minutes <= 0 &&
 			time.seconds <= 0
 		) {
-			if (!finishedCountdown) fireworks(15000);
-
+			if (!finishedCountdown) fireworks(5000);
 			finishedCountdown = true;
 			usrMsgElement = true;
 			msg = "Finished!";
@@ -218,15 +228,29 @@
 	}
 </style>
 
+<svelte:head>
+	<script
+		lang="js"
+		src="https://unpkg.com/ionicons@5.1.2/dist/ionicons/ionicons.js">
+	</script>
+</svelte:head>
 <div class="App">
 	<header class="App-header">
 		<div>
 			<p style="font-size: 3em;">
+				<span hidden={usrMsgElement}><ion-icon
+						name="hourglass-outline" />
+				</span>
+				<span hidden={!usrMsgElement}><ion-icon
+						name="checkmark-outline" />
+				</span>
+				<br />
 				<span
 					hidden={usrMsgElement}
 					contenteditable
 					bind:innerHTML={userMessage}
 					spellcheck={false} />
+
 				{msg}
 			</p>
 			<input

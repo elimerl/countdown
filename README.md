@@ -1,29 +1,12 @@
-# New Project
+# Countdown
 
-> ✨ Bootstrapped with Create Snowpack App (CSA).
+> A minimal countdown timer.
 
-## Available Scripts
+I made this to get familiar with [Svelte](https://svelte.dev).
+It is hosted at [elimerl.github.io/countdown/](https://elimerl.github.io/countdown/)
 
-### npm start
+## Usage
 
-Runs the app in the development mode.
-Open http://localhost:8080 to view it in the browser.
-
-The page will reload if you make edits.
-You will also see any lint errors in the console.
-
-### npm test
-
-Launches the test runner in the interactive watch mode.
-See the section about running tests for more information.
-
-### npm run build
-
-Builds a static copy of your site to the `build/` folder.
-Your app is ready to be deployed!
-
-**For the best production performance:** Add a build bundler plugin like [@snowpack/plugin-webpack](https://github.com/snowpackjs/snowpack/tree/main/plugins/plugin-webpack) or [snowpack-plugin-rollup-bundle](https://github.com/ParamagicDev/snowpack-plugin-rollup-bundle) to your `snowpack.config.json` config file.
-
-### Q: What about Eject?
-
-No eject needed! Snowpack guarantees zero lock-in, and CSA strives for the same.
+Click the text that says `Countdown ends` - you can edit it!
+To change the date, use the datetime picker.
+To share the countdown, press `Copy Permalink`.
