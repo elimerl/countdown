@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { timestampToDatetimeInputString } from "./polyfill";
 	import confetti from "canvas-confetti";
 	let usrMsgElement = false;
 	const parsedHash: {
@@ -7,19 +8,23 @@
 		time?: string;
 	} = {};
 	parser(window.location.hash.slice(1), parsedHash);
-	console.log(new Date().toISOString().slice(0, 16));
+	const nowAlmost = new Date();
+	nowAlmost.setMinutes(nowAlmost.getMinutes() + 5);
 	let countdown = parsedHash.countdown
 		? decodeURIComponent(parsedHash.countdown)
 		: localStorage.getItem("lastDate") ||
-		  new Date().toISOString().slice(0, 16);
+		  timestampToDatetimeInputString(nowAlmost.getTime());
 	let msg = "in";
 	let userMessage = parsedHash.message
 		? decodeURIComponent(parsedHash.message)
 		: localStorage.getItem("userMessage") || "Countdown ends";
 	$: {
-		const countdownDate = new Date(countdown);
+		localStorage.setItem("lastDate", countdown);
+		localStorage.setItem("userMessage", userMessage);
 
+		const countdownDate = new Date(countdown);
 		const time = timeLeft(countdownDate.getTime());
+
 		if (
 			time.days >= 0 &&
 			time.hours >= 0 &&
@@ -28,11 +33,6 @@
 		) {
 			usrMsgElement = false;
 			genMsg();
-			localStorage.setItem(
-				"lastDate",
-				new Date(countdown).toISOString().slice(0, 16)
-			);
-			localStorage.setItem("userMessage", userMessage);
 			finishedCountdown = false;
 		}
 	}
