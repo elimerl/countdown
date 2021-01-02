@@ -20,6 +20,8 @@ import {
 	text
 } from "../web_modules/svelte/internal.js";
 
+import confetti from "../web_modules/canvas-confetti.js";
+
 function create_fragment(ctx) {
 	let div1;
 	let header;
@@ -28,12 +30,15 @@ function create_fragment(ctx) {
 	let div0;
 	let p;
 	let span;
+	let span_spellcheck_value;
 	let t2;
 	let t3;
 	let t4;
 	let input;
 	let t5;
 	let button;
+	let t7;
+	let small;
 	let mounted;
 	let dispose;
 
@@ -48,22 +53,32 @@ function create_fragment(ctx) {
 			p = element("p");
 			span = element("span");
 			t2 = space();
-			t3 = text(/*msg*/ ctx[2]);
+			t3 = text(/*msg*/ ctx[3]);
 			t4 = space();
 			input = element("input");
 			t5 = space();
 			button = element("button");
 			button.textContent = "Copy\n\t\t\t\tPermalink";
+			t7 = space();
+			small = element("small");
+
+			small.textContent = `Uses
+			${Intl.DateTimeFormat().resolvedOptions().timeZone}
+			time.`;
+
+			span.hidden = /*usrMsgElement*/ ctx[2];
 			attr(span, "contenteditable", "");
-			if (/*userMessage*/ ctx[1] === void 0) add_render_callback(() => /*span_input_handler*/ ctx[4].call(span));
+			attr(span, "spellcheck", span_spellcheck_value = false);
+			if (/*userMessage*/ ctx[1] === void 0) add_render_callback(() => /*span_input_handler*/ ctx[5].call(span));
 			set_style(p, "font-size", "3em");
-			attr(p, "class", "svelte-fquoqz");
-			attr(input, "type", "date");
+			attr(p, "class", "svelte-22ess9");
+			attr(input, "type", "datetime-local");
 			attr(input, "id", "countdown");
-			attr(input, "class", "svelte-fquoqz");
-			attr(button, "class", "svelte-fquoqz");
-			attr(header, "class", "App-header svelte-fquoqz");
-			attr(div1, "class", "App svelte-fquoqz");
+			attr(input, "class", "svelte-22ess9");
+			attr(button, "class", "svelte-22ess9");
+			set_style(small, "font-size", ".5em");
+			attr(header, "class", "App-header svelte-22ess9");
+			attr(div1, "class", "App svelte-22ess9");
 		},
 		m(target, anchor) {
 			insert(target, div1, anchor);
@@ -85,23 +100,29 @@ function create_fragment(ctx) {
 			set_input_value(input, /*countdown*/ ctx[0]);
 			append(div0, t5);
 			append(div0, button);
+			append(header, t7);
+			append(header, small);
 
 			if (!mounted) {
 				dispose = [
-					listen(span, "input", /*span_input_handler*/ ctx[4]),
-					listen(input, "input", /*input_input_handler*/ ctx[5]),
-					listen(button, "click", /*click_handler*/ ctx[6])
+					listen(span, "input", /*span_input_handler*/ ctx[5]),
+					listen(input, "input", /*input_input_handler*/ ctx[6]),
+					listen(button, "click", /*click_handler*/ ctx[7])
 				];
 
 				mounted = true;
 			}
 		},
 		p(ctx, [dirty]) {
+			if (dirty & /*usrMsgElement*/ 4) {
+				span.hidden = /*usrMsgElement*/ ctx[2];
+			}
+
 			if (dirty & /*userMessage*/ 2 && /*userMessage*/ ctx[1] !== span.innerHTML) {
 				span.innerHTML = /*userMessage*/ ctx[1];
 			}
 
-			if (dirty & /*msg*/ 4) set_data(t3, /*msg*/ ctx[2]);
+			if (dirty & /*msg*/ 8) set_data(t3, /*msg*/ ctx[3]);
 
 			if (dirty & /*countdown*/ 1) {
 				set_input_value(input, /*countdown*/ ctx[0]);
@@ -116,8 +137,6 @@ function create_fragment(ctx) {
 		}
 	};
 }
-
-let formattedTime = "";
 
 function timeLeft(countDownDate) {
 	const now = new Date().getTime();
@@ -162,64 +181,58 @@ function parser(string, results) {
 }
 
 function instance($$self, $$props, $$invalidate) {
-	"use strict";
+	let usrMsgElement = false;
 	const parsedHash = {};
 	parser(window.location.hash.slice(1), parsedHash);
 	console.log(parsedHash);
 
 	let countdown = parsedHash.countdown
 	? decodeURIComponent(parsedHash.countdown)
-	: localStorage.getItem("lastDate") || "2021-12-31";
+	: localStorage.getItem("lastDate") || new Date().toISOString().slice(0, 16);
 
+	console.log(countdown);
 	let msg = "in";
 
 	let userMessage = parsedHash.message
 	? decodeURIComponent(parsedHash.message)
 	: localStorage.getItem("userMessage") || "Countdown ends";
 
-	msg = "in";
-	const time = timeLeft(new Date(countdown).getTime());
+	let finishedCountdown = false;
 
-	if (time.days > 0) {
-		msg += ` ${time.days} days`;
+	function genMsg() {
+		$$invalidate(3, msg = "in");
+		const countdownDate = new Date(countdown);
+		const time = timeLeft(countdownDate.getTime());
+
+		if (time.days <= 0 && time.hours <= 0 && time.minutes <= 0 && time.seconds <= 0) {
+			finishedCountdown = true;
+			$$invalidate(2, usrMsgElement = true);
+			$$invalidate(3, msg = "Finished!");
+			if (!finishedCountdown) confetti();
+		}
+
+		if (time.days > 0) {
+			$$invalidate(3, msg += ` ${time.days} days`);
+		}
+
+		if (time.hours > 0) {
+			$$invalidate(3, msg += ` ${time.hours} hours`);
+		}
+
+		if (time.minutes > 0) {
+			$$invalidate(3, msg += ` ${time.minutes} minutes`);
+		}
+
+		if (time.seconds > 0) {
+			$$invalidate(3, msg += ` ${time.seconds} seconds`);
+		}
 	}
 
-	if (time.hours > 0) {
-		msg += ` ${time.hours} hours`;
-	}
-
-	if (time.minutes > 0) {
-		msg += ` ${time.minutes} minutes`;
-	}
-
-	if (time.seconds > 0) {
-		msg += ` ${time.seconds} seconds`;
-	}
+	genMsg();
 
 	setInterval(
 		() => {
-			$$invalidate(2, msg = "in");
-			const time = timeLeft(new Date(countdown).getTime());
-
-			if (time.days > 0) {
-				$$invalidate(2, msg += ` ${time.days} days`);
-			}
-
-			if (time.hours > 0) {
-				$$invalidate(2, msg += ` ${time.hours} hours`);
-			}
-
-			if (time.minutes > 0) {
-				$$invalidate(2, msg += ` ${time.minutes} minutes`);
-			}
-
-			if (time.minutes > 0 && time.seconds > 0) {
-				$$invalidate(2, msg += " and");
-			}
-
-			if (time.seconds > 0) {
-				$$invalidate(2, msg += ` ${time.seconds} seconds`);
-			}
+			genMsg();
 		},
 		1000
 	);
@@ -245,7 +258,10 @@ function instance($$self, $$props, $$invalidate) {
 	$$self.$$.update = () => {
 		if ($$self.$$.dirty & /*countdown, userMessage*/ 3) {
 			$: {
-				localStorage.setItem("lastDate", countdown);
+				console.log(countdown);
+				$$invalidate(2, usrMsgElement = false);
+				genMsg();
+				localStorage.setItem("lastDate", new Date(countdown).toISOString().slice(0, 16));
 				localStorage.setItem("userMessage", userMessage);
 			}
 		}
@@ -254,6 +270,7 @@ function instance($$self, $$props, $$invalidate) {
 	return [
 		countdown,
 		userMessage,
+		usrMsgElement,
 		msg,
 		getPermaLink,
 		span_input_handler,
