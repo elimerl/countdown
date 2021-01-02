@@ -184,13 +184,11 @@ function instance($$self, $$props, $$invalidate) {
 	let usrMsgElement = false;
 	const parsedHash = {};
 	parser(window.location.hash.slice(1), parsedHash);
-	console.log(parsedHash);
 
 	let countdown = parsedHash.countdown
 	? decodeURIComponent(parsedHash.countdown)
 	: localStorage.getItem("lastDate") || new Date().toISOString().slice(0, 16);
 
-	console.log(countdown);
 	let msg = "in";
 
 	let userMessage = parsedHash.message
@@ -205,10 +203,10 @@ function instance($$self, $$props, $$invalidate) {
 		const time = timeLeft(countdownDate.getTime());
 
 		if (time.days <= 0 && time.hours <= 0 && time.minutes <= 0 && time.seconds <= 0) {
+			if (!finishedCountdown) fireworks(15000);
 			finishedCountdown = true;
 			$$invalidate(2, usrMsgElement = true);
 			$$invalidate(3, msg = "Finished!");
-			if (!finishedCountdown) confetti();
 		}
 
 		if (time.days > 0) {
@@ -226,6 +224,52 @@ function instance($$self, $$props, $$invalidate) {
 		if (time.seconds > 0) {
 			$$invalidate(3, msg += ` ${time.seconds} second${time.seconds === 1 ? "" : "s"}`);
 		}
+	}
+
+	function fireworks(duration) {
+		const animationEnd = Date.now() + duration;
+
+		const defaults = {
+			startVelocity: 30,
+			spread: 360,
+			ticks: 60,
+			zIndex: 0
+		};
+
+		function randomInRange(min, max) {
+			return Math.random() * (max - min) + min;
+		}
+
+		//@ts-expect-error
+		const interval = setInterval(
+			function () {
+				const timeLeft = animationEnd - Date.now();
+
+				if (timeLeft <= 0) {
+					return clearInterval(interval);
+				}
+
+				const particleCount = 50 * (timeLeft / duration);
+
+				// since particles fall down, start a bit higher than random
+				confetti(Object.assign({}, defaults, {
+					particleCount,
+					origin: {
+						x: randomInRange(0.1, 0.3),
+						y: Math.random() - 0.2
+					}
+				}));
+
+				confetti(Object.assign({}, defaults, {
+					particleCount,
+					origin: {
+						x: randomInRange(0.7, 0.9),
+						y: Math.random() - 0.2
+					}
+				}));
+			},
+			250
+		);
 	}
 
 	genMsg();
@@ -258,11 +302,11 @@ function instance($$self, $$props, $$invalidate) {
 	$$self.$$.update = () => {
 		if ($$self.$$.dirty & /*countdown, userMessage*/ 3) {
 			$: {
-				console.log(countdown);
 				$$invalidate(2, usrMsgElement = false);
 				genMsg();
 				localStorage.setItem("lastDate", new Date(countdown).toISOString().slice(0, 16));
 				localStorage.setItem("userMessage", userMessage);
+				finishedCountdown = false;
 			}
 		}
 	};
