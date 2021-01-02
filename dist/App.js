@@ -31,9 +31,9 @@ function create_fragment(ctx) {
 	let t2;
 	let t3;
 	let t4;
-	let input0;
+	let input;
 	let t5;
-	let input1;
+	let button;
 	let mounted;
 	let dispose;
 
@@ -50,20 +50,18 @@ function create_fragment(ctx) {
 			t2 = space();
 			t3 = text(/*msg*/ ctx[2]);
 			t4 = space();
-			input0 = element("input");
+			input = element("input");
 			t5 = space();
-			input1 = element("input");
+			button = element("button");
+			button.textContent = "Copy\n\t\t\t\tPermalink";
 			attr(span, "contenteditable", "");
-			if (/*userMessage*/ ctx[1] === void 0) add_render_callback(() => /*span_input_handler*/ ctx[3].call(span));
+			if (/*userMessage*/ ctx[1] === void 0) add_render_callback(() => /*span_input_handler*/ ctx[4].call(span));
 			set_style(p, "font-size", "3em");
 			attr(p, "class", "svelte-fquoqz");
-			attr(input0, "type", "date");
-			attr(input0, "id", "countdown");
-			attr(input0, "class", "svelte-fquoqz");
-			attr(input1, "type", "time");
-			attr(input1, "id", "time");
-			input1.value = "23:59";
-			attr(input1, "class", "svelte-fquoqz");
+			attr(input, "type", "date");
+			attr(input, "id", "countdown");
+			attr(input, "class", "svelte-fquoqz");
+			attr(button, "class", "svelte-fquoqz");
 			attr(header, "class", "App-header svelte-fquoqz");
 			attr(div1, "class", "App svelte-fquoqz");
 		},
@@ -83,15 +81,16 @@ function create_fragment(ctx) {
 			append(p, t2);
 			append(p, t3);
 			append(div0, t4);
-			append(div0, input0);
-			set_input_value(input0, /*countdown*/ ctx[0]);
+			append(div0, input);
+			set_input_value(input, /*countdown*/ ctx[0]);
 			append(div0, t5);
-			append(div0, input1);
+			append(div0, button);
 
 			if (!mounted) {
 				dispose = [
-					listen(span, "input", /*span_input_handler*/ ctx[3]),
-					listen(input0, "input", /*input0_input_handler*/ ctx[4])
+					listen(span, "input", /*span_input_handler*/ ctx[4]),
+					listen(input, "input", /*input_input_handler*/ ctx[5]),
+					listen(button, "click", /*click_handler*/ ctx[6])
 				];
 
 				mounted = true;
@@ -105,7 +104,7 @@ function create_fragment(ctx) {
 			if (dirty & /*msg*/ 4) set_data(t3, /*msg*/ ctx[2]);
 
 			if (dirty & /*countdown*/ 1) {
-				set_input_value(input0, /*countdown*/ ctx[0]);
+				set_input_value(input, /*countdown*/ ctx[0]);
 			}
 		},
 		i: noop,
@@ -130,11 +129,54 @@ function timeLeft(countDownDate) {
 	return { days, hours, minutes, seconds };
 }
 
+function parser(string, results) {
+	"use strict";
+	const result = (/((?:"[^"]+[^\\]")|(?:'[^']+[^\\]')|(?:[^=]+))\s*=\s*("(?:[\s\S]*?[^\\])"|'(?:[\s\S]*?[^\\])'|(?:.*?[^\\])|$)(?:;|$)(?:\s*(.*))?/m).exec(string);
+
+	if (result && result[1]) {
+		const key = result[1].trim().replace(/(^\s*["'])|(["']\s*$)/g, "");
+
+		if (typeof result[2] === "string") {
+			const val = result[2].replace(/(^\s*[\\]?["'])|([\\]?["']\s*$)/g, "");
+
+			// const val = result[2];
+			if ((/^[0-9-.,]+$/).test(val)) {
+				results[key] = parseFloat(val);
+			} else if (val === "") {
+				results[key] = undefined;
+			} else if (val.toLowerCase() === "true") {
+				results[key] = true;
+			} else if (val.toLowerCase() === "false") {
+				results[key] = false;
+			} else {
+				results[key] = val;
+			}
+		} else {
+			results[result[1].trim()] = undefined;
+		}
+
+		if (result[3] && result[3].length > 1) {
+			parser(result[3], results);
+		}
+	}
+}
+
 function instance($$self, $$props, $$invalidate) {
 	"use strict";
-	let countdown = localStorage.getItem("lastDate") || "2021-12-31";
+	const parsedHash = {};
+	parser(window.location.hash.slice(1), parsedHash);
+	console.log(parsedHash);
+
+	let countdown = parsedHash.countdown
+	? decodeURIComponent(parsedHash.countdown)
+	: localStorage.getItem("lastDate") || "2021-12-31";
+
 	let msg = "in";
-	let userMessage = localStorage.getItem("userMessage") || "Countdown ends";
+
+	let userMessage = parsedHash.message
+	? decodeURIComponent(parsedHash.message)
+	: localStorage.getItem("userMessage") || "Countdown ends";
+
 	msg = "in";
 	const time = timeLeft(new Date(countdown).getTime());
 
@@ -182,15 +224,23 @@ function instance($$self, $$props, $$invalidate) {
 		1000
 	);
 
+	function getPermaLink() {
+		const url = new URL(window.location.href);
+		url.hash = `message=${encodeURIComponent(userMessage)};countdown=${encodeURIComponent(countdown)}`;
+		return url.href;
+	}
+
 	function span_input_handler() {
 		userMessage = this.innerHTML;
 		$$invalidate(1, userMessage);
 	}
 
-	function input0_input_handler() {
+	function input_input_handler() {
 		countdown = this.value;
 		$$invalidate(0, countdown);
 	}
+
+	const click_handler = () => navigator.clipboard.writeText(getPermaLink());
 
 	$$self.$$.update = () => {
 		if ($$self.$$.dirty & /*countdown, userMessage*/ 3) {
@@ -201,7 +251,15 @@ function instance($$self, $$props, $$invalidate) {
 		}
 	};
 
-	return [countdown, userMessage, msg, span_input_handler, input0_input_handler];
+	return [
+		countdown,
+		userMessage,
+		msg,
+		getPermaLink,
+		span_input_handler,
+		input_input_handler,
+		click_handler
+	];
 }
 
 class App extends SvelteComponent {
