@@ -212,19 +212,19 @@ function instance($$self, $$props, $$invalidate) {
 		}
 
 		if (time.days > 0) {
-			$$invalidate(3, msg += ` ${time.days} days`);
+			$$invalidate(3, msg += ` ${time.days} day${time.days === 1 ? "" : "s"}`);
 		}
 
 		if (time.hours > 0) {
-			$$invalidate(3, msg += ` ${time.hours} hours`);
+			$$invalidate(3, msg += ` ${time.hours} hour${time.hours === 1 ? "" : "s"}`);
 		}
 
 		if (time.minutes > 0) {
-			$$invalidate(3, msg += ` ${time.minutes} minutes`);
+			$$invalidate(3, msg += ` ${time.minutes} minute${time.minutes === 1 ? "" : "s"}`);
 		}
 
 		if (time.seconds > 0) {
-			$$invalidate(3, msg += ` ${time.seconds} seconds`);
+			$$invalidate(3, msg += ` ${time.seconds} second${time.seconds === 1 ? "" : "s"}`);
 		}
 	}
 
