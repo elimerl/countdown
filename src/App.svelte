@@ -220,7 +220,6 @@
 
 <div class="App">
 	<header class="App-header">
-		<h1>Countdown</h1>
 		<div>
 			<p style="font-size: 3em;">
 				<span
