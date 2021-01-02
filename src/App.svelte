@@ -9,7 +9,7 @@
 	} = {};
 	parser(window.location.hash.slice(1), parsedHash);
 	const nowAlmost = new Date();
-	nowAlmost.setMinutes(nowAlmost.getMinutes() + 5);
+	nowAlmost.setMinutes(nowAlmost.getMinutes() + 1);
 	let countdown = parsedHash.countdown
 		? decodeURIComponent(parsedHash.countdown)
 		: localStorage.getItem("lastDate") ||
@@ -260,6 +260,11 @@
 			<button
 				on:click={() => navigator.clipboard.writeText(getPermaLink())}>Copy
 				Permalink</button>
+			<button
+				on:click={() => {
+					localStorage.clear();
+					window.location.reload();
+				}}>Reset</button>
 		</div>
 		<small style="font-size: .5em;">Uses
 			{Intl.DateTimeFormat().resolvedOptions().timeZone}
