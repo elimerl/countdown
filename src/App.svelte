@@ -7,19 +7,15 @@
 		time?: string;
 	} = {};
 	parser(window.location.hash.slice(1), parsedHash);
-	console.log(parsedHash);
 	let countdown = parsedHash.countdown
 		? decodeURIComponent(parsedHash.countdown)
 		: localStorage.getItem("lastDate") ||
 		  new Date().toISOString().slice(0, 16);
-	console.log(countdown);
 	let msg = "in";
 	let userMessage = parsedHash.message
 		? decodeURIComponent(parsedHash.message)
 		: localStorage.getItem("userMessage") || "Countdown ends";
 	$: {
-		console.log(countdown);
-
 		usrMsgElement = false;
 		genMsg();
 		localStorage.setItem(
@@ -27,6 +23,7 @@
 			new Date(countdown).toISOString().slice(0, 16)
 		);
 		localStorage.setItem("userMessage", userMessage);
+		finishedCountdown = false;
 	}
 	function timeLeft(countDownDate: number) {
 		const now = new Date().getTime();
@@ -51,11 +48,11 @@
 			time.minutes <= 0 &&
 			time.seconds <= 0
 		) {
+			if (!finishedCountdown) fireworks(15000);
+
 			finishedCountdown = true;
 			usrMsgElement = true;
-
 			msg = "Finished!";
-			if (!finishedCountdown) confetti();
 		}
 		if (time.days > 0) {
 			msg += ` ${time.days} day${time.days === 1 ? "" : "s"}`;
@@ -69,6 +66,48 @@
 		if (time.seconds > 0) {
 			msg += ` ${time.seconds} second${time.seconds === 1 ? "" : "s"}`;
 		}
+	}
+	function fireworks(duration: number) {
+		const animationEnd = Date.now() + duration;
+		const defaults = {
+			startVelocity: 30,
+			spread: 360,
+			ticks: 60,
+			zIndex: 0,
+		};
+
+		function randomInRange(min: number, max: number) {
+			return Math.random() * (max - min) + min;
+		}
+		//@ts-expect-error
+		const interval = setInterval(function () {
+			const timeLeft = animationEnd - Date.now();
+
+			if (timeLeft <= 0) {
+				return clearInterval(interval);
+			}
+
+			const particleCount = 50 * (timeLeft / duration);
+			// since particles fall down, start a bit higher than random
+			confetti(
+				Object.assign({}, defaults, {
+					particleCount,
+					origin: {
+						x: randomInRange(0.1, 0.3),
+						y: Math.random() - 0.2,
+					},
+				})
+			);
+			confetti(
+				Object.assign({}, defaults, {
+					particleCount,
+					origin: {
+						x: randomInRange(0.7, 0.9),
+						y: Math.random() - 0.2,
+					},
+				})
+			);
+		}, 250);
 	}
 	genMsg();
 	setInterval(() => {
