@@ -348,7 +348,7 @@ function instance($$self, $$props, $$invalidate) {
 				const countdownDate = new Date(countdown);
 				const time = timeLeft(countdownDate.getTime());
 
-				if (time.days <= 0 && time.hours <= 0 && time.minutes <= 0 && time.seconds <= 0) {
+				if (time.days >= 0 && time.hours >= 0 && time.minutes >= 0 && time.seconds >= 0) {
 					$$invalidate(2, usrMsgElement = false);
 					genMsg();
 					localStorage.setItem("lastDate", new Date(countdown).toISOString().slice(0, 16));
