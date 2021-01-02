@@ -48,8 +48,10 @@ function create_fragment(ctx) {
 	let t6;
 	let input;
 	let t7;
-	let button;
+	let button0;
 	let t9;
+	let button1;
+	let t11;
 	let small;
 	let mounted;
 	let dispose;
@@ -76,9 +78,12 @@ function create_fragment(ctx) {
 			t6 = space();
 			input = element("input");
 			t7 = space();
-			button = element("button");
-			button.textContent = "Copy\n\t\t\t\tPermalink";
+			button0 = element("button");
+			button0.textContent = "Copy\n\t\t\t\tPermalink";
 			t9 = space();
+			button1 = element("button");
+			button1.textContent = "Reset";
+			t11 = space();
 			small = element("small");
 
 			small.textContent = `Uses
@@ -100,7 +105,8 @@ function create_fragment(ctx) {
 			attr(input, "type", "datetime-local");
 			attr(input, "id", "countdown");
 			attr(input, "class", "svelte-22ess9");
-			attr(button, "class", "svelte-22ess9");
+			attr(button0, "class", "svelte-22ess9");
+			attr(button1, "class", "svelte-22ess9");
 			set_style(small, "font-size", ".5em");
 			attr(header, "class", "App-header svelte-22ess9");
 			attr(div1, "class", "App svelte-22ess9");
@@ -132,15 +138,18 @@ function create_fragment(ctx) {
 			append(div0, input);
 			set_input_value(input, /*countdown*/ ctx[0]);
 			append(div0, t7);
-			append(div0, button);
-			append(header, t9);
+			append(div0, button0);
+			append(div0, t9);
+			append(div0, button1);
+			append(header, t11);
 			append(header, small);
 
 			if (!mounted) {
 				dispose = [
 					listen(span2, "input", /*span2_input_handler*/ ctx[5]),
 					listen(input, "input", /*input_input_handler*/ ctx[6]),
-					listen(button, "click", /*click_handler*/ ctx[7])
+					listen(button0, "click", /*click_handler*/ ctx[7]),
+					listen(button1, "click", /*click_handler_1*/ ctx[8])
 				];
 
 				mounted = true;
@@ -228,7 +237,7 @@ function instance($$self, $$props, $$invalidate) {
 	const parsedHash = {};
 	parser(window.location.hash.slice(1), parsedHash);
 	const nowAlmost = new Date();
-	nowAlmost.setMinutes(nowAlmost.getMinutes() + 5);
+	nowAlmost.setMinutes(nowAlmost.getMinutes() + 1);
 
 	let countdown = parsedHash.countdown
 	? decodeURIComponent(parsedHash.countdown)
@@ -344,6 +353,11 @@ function instance($$self, $$props, $$invalidate) {
 
 	const click_handler = () => navigator.clipboard.writeText(getPermaLink());
 
+	const click_handler_1 = () => {
+		localStorage.clear();
+		window.location.reload();
+	};
+
 	$$self.$$.update = () => {
 		if ($$self.$$.dirty & /*countdown, userMessage*/ 3) {
 			$: {
@@ -369,7 +383,8 @@ function instance($$self, $$props, $$invalidate) {
 		getPermaLink,
 		span2_input_handler,
 		input_input_handler,
-		click_handler
+		click_handler,
+		click_handler_1
 	];
 }
 
