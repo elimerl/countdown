@@ -21,6 +21,7 @@ import {
 	text
 } from "../web_modules/svelte/internal.js";
 
+import { timestampToDatetimeInputString } from "./polyfill.js";
 import confetti from "../web_modules/canvas-confetti.js";
 
 function create_fragment(ctx) {
@@ -226,11 +227,12 @@ function instance($$self, $$props, $$invalidate) {
 	let usrMsgElement = false;
 	const parsedHash = {};
 	parser(window.location.hash.slice(1), parsedHash);
-	console.log(new Date().toISOString().slice(0, 16));
+	const nowAlmost = new Date();
+	nowAlmost.setMinutes(nowAlmost.getMinutes() + 5);
 
 	let countdown = parsedHash.countdown
 	? decodeURIComponent(parsedHash.countdown)
-	: localStorage.getItem("lastDate") || new Date().toISOString().slice(0, 16);
+	: localStorage.getItem("lastDate") || timestampToDatetimeInputString(nowAlmost.getTime());
 
 	let msg = "in";
 
@@ -345,14 +347,14 @@ function instance($$self, $$props, $$invalidate) {
 	$$self.$$.update = () => {
 		if ($$self.$$.dirty & /*countdown, userMessage*/ 3) {
 			$: {
+				localStorage.setItem("lastDate", countdown);
+				localStorage.setItem("userMessage", userMessage);
 				const countdownDate = new Date(countdown);
 				const time = timeLeft(countdownDate.getTime());
 
 				if (time.days >= 0 && time.hours >= 0 && time.minutes >= 0 && time.seconds >= 0) {
 					$$invalidate(2, usrMsgElement = false);
 					genMsg();
-					localStorage.setItem("lastDate", new Date(countdown).toISOString().slice(0, 16));
-					localStorage.setItem("userMessage", userMessage);
 					finishedCountdown = false;
 				}
 			}
