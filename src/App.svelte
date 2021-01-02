@@ -1,8 +1,15 @@
 <script>
-	let countdown = localStorage.getItem("lastDate") || "2021-12-31";
+	const parsedHash: { countdown?: string; message?: string } = {};
+	parser(window.location.hash.slice(1), parsedHash);
+	console.log(parsedHash);
+	let countdown = parsedHash.countdown
+		? decodeURIComponent(parsedHash.countdown)
+		: localStorage.getItem("lastDate") || "2021-12-31";
 	let msg = "in";
 	let formattedTime = "";
-	let userMessage = localStorage.getItem("userMessage") || "Countdown ends";
+	let userMessage = parsedHash.message
+		? decodeURIComponent(parsedHash.message)
+		: localStorage.getItem("userMessage") || "Countdown ends";
 	$: {
 		localStorage.setItem("lastDate", countdown);
 		localStorage.setItem("userMessage", userMessage);
@@ -51,6 +58,49 @@
 			msg += ` ${time.seconds} seconds`;
 		}
 	}, 1000);
+	function parser(
+		string: string,
+		results: { [key: string]: string | number | boolean | undefined }
+	) {
+		"use strict";
+		const result = /((?:"[^"]+[^\\]")|(?:'[^']+[^\\]')|(?:[^=]+))\s*=\s*("(?:[\s\S]*?[^\\])"|'(?:[\s\S]*?[^\\])'|(?:.*?[^\\])|$)(?:;|$)(?:\s*(.*))?/m.exec(
+			string
+		);
+		if (result && result[1]) {
+			const key = result[1].trim().replace(/(^\s*["'])|(["']\s*$)/g, "");
+			if (typeof result[2] === "string") {
+				const val = result[2].replace(
+					/(^\s*[\\]?["'])|([\\]?["']\s*$)/g,
+					""
+				);
+				// const val = result[2];
+				if (/^[0-9-.,]+$/.test(val)) {
+					results[key] = parseFloat(val);
+				} else if (val === "") {
+					results[key] = undefined;
+				} else if (val.toLowerCase() === "true") {
+					results[key] = true;
+				} else if (val.toLowerCase() === "false") {
+					results[key] = false;
+				} else {
+					results[key] = val;
+				}
+			} else {
+				results[result[1].trim()] = undefined;
+			}
+			if (result[3] && result[3].length > 1) {
+				parser(result[3], results);
+			}
+		}
+	}
+
+	function getPermaLink() {
+		const url = new URL(window.location.href);
+		url.hash = `message=${encodeURIComponent(
+			userMessage
+		)};countdown=${encodeURIComponent(countdown)}`;
+		return url.href;
+	}
 </script>
 
 <style>
@@ -126,8 +176,10 @@
 				{msg}
 			</p>
 			<input type="date" bind:value={countdown} id="countdown" />
-			<input type="time" id="time" value="23:59" />
 			<!-- midnight isn't working???-->
+			<button
+				on:click={() => navigator.clipboard.writeText(getPermaLink())}>Copy
+				Permalink</button>
 		</div>
 	</header>
 </div>
