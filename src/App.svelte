@@ -58,16 +58,16 @@
 			if (!finishedCountdown) confetti();
 		}
 		if (time.days > 0) {
-			msg += ` ${time.days} days`;
+			msg += ` ${time.days} day${time.days === 1 ? "" : "s"}`;
 		}
 		if (time.hours > 0) {
-			msg += ` ${time.hours} hours`;
+			msg += ` ${time.hours} hour${time.hours === 1 ? "" : "s"}`;
 		}
 		if (time.minutes > 0) {
-			msg += ` ${time.minutes} minutes`;
+			msg += ` ${time.minutes} minute${time.minutes === 1 ? "" : "s"}`;
 		}
 		if (time.seconds > 0) {
-			msg += ` ${time.seconds} seconds`;
+			msg += ` ${time.seconds} second${time.seconds === 1 ? "" : "s"}`;
 		}
 	}
 	genMsg();
