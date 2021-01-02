@@ -25,19 +25,17 @@ import confetti from "../web_modules/canvas-confetti.js";
 function create_fragment(ctx) {
 	let div1;
 	let header;
-	let h1;
-	let t1;
 	let div0;
 	let p;
 	let span;
 	let span_spellcheck_value;
+	let t0;
+	let t1;
 	let t2;
-	let t3;
-	let t4;
 	let input;
-	let t5;
+	let t3;
 	let button;
-	let t7;
+	let t5;
 	let small;
 	let mounted;
 	let dispose;
@@ -46,20 +44,17 @@ function create_fragment(ctx) {
 		c() {
 			div1 = element("div");
 			header = element("header");
-			h1 = element("h1");
-			h1.textContent = "Countdown";
-			t1 = space();
 			div0 = element("div");
 			p = element("p");
 			span = element("span");
+			t0 = space();
+			t1 = text(/*msg*/ ctx[3]);
 			t2 = space();
-			t3 = text(/*msg*/ ctx[3]);
-			t4 = space();
 			input = element("input");
-			t5 = space();
+			t3 = space();
 			button = element("button");
 			button.textContent = "Copy\n\t\t\t\tPermalink";
-			t7 = space();
+			t5 = space();
 			small = element("small");
 
 			small.textContent = `Uses
@@ -83,8 +78,6 @@ function create_fragment(ctx) {
 		m(target, anchor) {
 			insert(target, div1, anchor);
 			append(div1, header);
-			append(header, h1);
-			append(header, t1);
 			append(header, div0);
 			append(div0, p);
 			append(p, span);
@@ -93,14 +86,14 @@ function create_fragment(ctx) {
 				span.innerHTML = /*userMessage*/ ctx[1];
 			}
 
-			append(p, t2);
-			append(p, t3);
-			append(div0, t4);
+			append(p, t0);
+			append(p, t1);
+			append(div0, t2);
 			append(div0, input);
 			set_input_value(input, /*countdown*/ ctx[0]);
-			append(div0, t5);
+			append(div0, t3);
 			append(div0, button);
-			append(header, t7);
+			append(header, t5);
 			append(header, small);
 
 			if (!mounted) {
@@ -122,7 +115,7 @@ function create_fragment(ctx) {
 				span.innerHTML = /*userMessage*/ ctx[1];
 			}
 
-			if (dirty & /*msg*/ 8) set_data(t3, /*msg*/ ctx[3]);
+			if (dirty & /*msg*/ 8) set_data(t1, /*msg*/ ctx[3]);
 
 			if (dirty & /*countdown*/ 1) {
 				set_input_value(input, /*countdown*/ ctx[0]);
