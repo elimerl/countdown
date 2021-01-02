@@ -21,10 +21,10 @@
 
 		const time = timeLeft(countdownDate.getTime());
 		if (
-			time.days <= 0 &&
-			time.hours <= 0 &&
-			time.minutes <= 0 &&
-			time.seconds <= 0
+			time.days >= 0 &&
+			time.hours >= 0 &&
+			time.minutes >= 0 &&
+			time.seconds >= 0
 		) {
 			usrMsgElement = false;
 			genMsg();
