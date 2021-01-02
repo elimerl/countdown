@@ -1,17 +1,31 @@
 <script>
-	const parsedHash: { countdown?: string; message?: string } = {};
+	import confetti from "canvas-confetti";
+	let usrMsgElement = false;
+	const parsedHash: {
+		countdown?: string;
+		message?: string;
+		time?: string;
+	} = {};
 	parser(window.location.hash.slice(1), parsedHash);
 	console.log(parsedHash);
 	let countdown = parsedHash.countdown
 		? decodeURIComponent(parsedHash.countdown)
-		: localStorage.getItem("lastDate") || "2021-12-31";
+		: localStorage.getItem("lastDate") ||
+		  new Date().toISOString().slice(0, 16);
+	console.log(countdown);
 	let msg = "in";
-	let formattedTime = "";
 	let userMessage = parsedHash.message
 		? decodeURIComponent(parsedHash.message)
 		: localStorage.getItem("userMessage") || "Countdown ends";
 	$: {
-		localStorage.setItem("lastDate", countdown);
+		console.log(countdown);
+
+		usrMsgElement = false;
+		genMsg();
+		localStorage.setItem(
+			"lastDate",
+			new Date(countdown).toISOString().slice(0, 16)
+		);
 		localStorage.setItem("userMessage", userMessage);
 	}
 	function timeLeft(countDownDate: number) {
@@ -25,23 +39,24 @@
 		const seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
 		return { days, hours, minutes, seconds };
 	}
-	msg = "in";
-	const time = timeLeft(new Date(countdown).getTime());
-	if (time.days > 0) {
-		msg += ` ${time.days} days`;
-	}
-	if (time.hours > 0) {
-		msg += ` ${time.hours} hours`;
-	}
-	if (time.minutes > 0) {
-		msg += ` ${time.minutes} minutes`;
-	}
-	if (time.seconds > 0) {
-		msg += ` ${time.seconds} seconds`;
-	}
-	setInterval(() => {
+	let finishedCountdown = false;
+	function genMsg() {
 		msg = "in";
-		const time = timeLeft(new Date(countdown).getTime());
+		const countdownDate = new Date(countdown);
+
+		const time = timeLeft(countdownDate.getTime());
+		if (
+			time.days <= 0 &&
+			time.hours <= 0 &&
+			time.minutes <= 0 &&
+			time.seconds <= 0
+		) {
+			finishedCountdown = true;
+			usrMsgElement = true;
+
+			msg = "Finished!";
+			if (!finishedCountdown) confetti();
+		}
 		if (time.days > 0) {
 			msg += ` ${time.days} days`;
 		}
@@ -51,12 +66,13 @@
 		if (time.minutes > 0) {
 			msg += ` ${time.minutes} minutes`;
 		}
-		if (time.minutes > 0 && time.seconds > 0) {
-			msg += " and";
-		}
 		if (time.seconds > 0) {
 			msg += ` ${time.seconds} seconds`;
 		}
+	}
+	genMsg();
+	setInterval(() => {
+		genMsg();
 	}, 1000);
 	function parser(
 		string: string,
@@ -113,11 +129,7 @@
 	.App {
 		text-align: center;
 	}
-	.App code {
-		background: #0002;
-		padding: 4px 8px;
-		border-radius: 4px;
-	}
+
 	.App p {
 		margin: 0.4rem;
 	}
@@ -172,14 +184,23 @@
 		<h1>Countdown</h1>
 		<div>
 			<p style="font-size: 3em;">
-				<span contenteditable bind:innerHTML={userMessage} />
+				<span
+					hidden={usrMsgElement}
+					contenteditable
+					bind:innerHTML={userMessage}
+					spellcheck={false} />
 				{msg}
 			</p>
-			<input type="date" bind:value={countdown} id="countdown" />
-			<!-- midnight isn't working???-->
+			<input
+				type="datetime-local"
+				bind:value={countdown}
+				id="countdown" />
 			<button
 				on:click={() => navigator.clipboard.writeText(getPermaLink())}>Copy
 				Permalink</button>
 		</div>
+		<small style="font-size: .5em;">Uses
+			{Intl.DateTimeFormat().resolvedOptions().timeZone}
+			time.</small>
 	</header>
 </div>

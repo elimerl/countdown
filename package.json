@@ -5,6 +5,8 @@
     "test": "web-test-runner \"src/**/*.test.ts\""
   },
   "dependencies": {
+    "@types/canvas-confetti": "^1.3.0",
+    "canvas-confetti": "^1.3.2",
     "svelte": "^3.24.0"
   },
   "devDependencies": {
