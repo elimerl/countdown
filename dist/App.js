@@ -27,6 +27,7 @@ import confetti from "../web_modules/canvas-confetti.js";
 function create_fragment(ctx) {
 	let script;
 	let script_src_value;
+	let title_value;
 	let t0;
 	let div1;
 	let header;
@@ -55,6 +56,7 @@ function create_fragment(ctx) {
 	let small;
 	let mounted;
 	let dispose;
+	document.title = title_value = "Ends " + /*msg*/ ctx[3];
 
 	return {
 		c() {
@@ -156,6 +158,10 @@ function create_fragment(ctx) {
 			}
 		},
 		p(ctx, [dirty]) {
+			if (dirty & /*msg*/ 8 && title_value !== (title_value = "Ends " + /*msg*/ ctx[3])) {
+				document.title = title_value;
+			}
+
 			if (dirty & /*usrMsgElement*/ 4) {
 				span0.hidden = /*usrMsgElement*/ ctx[2];
 			}
