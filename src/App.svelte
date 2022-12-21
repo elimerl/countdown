@@ -233,6 +233,7 @@
 		lang="js"
 		src="https://unpkg.com/ionicons@5.1.2/dist/ionicons/ionicons.js">
 	</script>
+	<title>Ends {msg}</title>
 </svelte:head>
 <div class="App">
 	<header class="App-header">
